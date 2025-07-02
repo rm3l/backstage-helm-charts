@@ -1,0 +1,16 @@
+extraDeploy:
+  foo:
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: foo
+    data:
+      bar: baz
+
+  foo2: |
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: foo2
+    stringData:
+      myKey: myValue

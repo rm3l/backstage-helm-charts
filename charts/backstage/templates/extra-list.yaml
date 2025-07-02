@@ -1,4 +1,15 @@
+{{- if .Values.extraDeploy }}
+{{- if (kindIs "map" .Values.extraDeploy) }}
+{{- /* If extraDeploy is a dict, it will be possible to have Helm merge it automatically by key */ -}}
+{{- range $_, $value := .Values.extraDeploy }}
+---
+{{ include "common.tplvalues.render" (dict "value" $value "context" $) }}
+{{- end }}
+{{- else if (kindIs "slice" .Values.extraDeploy) }}
+{{- /* If extraDeploy is a list, keep current behavior (no merging) */ -}}
 {{- range .Values.extraDeploy }}
 ---
 {{ include "common.tplvalues.render" (dict "value" . "context" $) }}
+{{- end }}
+{{- end }}
 {{- end }}

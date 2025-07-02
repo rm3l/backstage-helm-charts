@@ -65,10 +65,22 @@ spec:
       {{- end }}
       volumes:
         {{- if (or .Values.backstage.extraAppConfig (and .Values.backstage.extraVolumeMounts .Values.backstage.extraVolumes)) }}
+        {{- if .Values.backstage.extraAppConfig }}
+        {{- if (kindIs "map" .Values.backstage.extraAppConfig) }}
+        {{- /* If extraAppConfig is a dict, merge it automatically by key */ -}}
+        {{- range $_, $value := .Values.backstage.extraAppConfig }}
+        - name: {{ $value.configMapRef }}
+          configMap:
+            name: {{ $value.configMapRef }}
+        {{- end }}
+        {{- else if (kindIs "slice" .Values.backstage.extraAppConfig) }}
+        {{- /* If extraAppConfig is a list, keep current behavior (no merging) */ -}}
         {{- range .Values.backstage.extraAppConfig }}
         - name: {{ .configMapRef }}
           configMap:
             name: {{ .configMapRef }}
+        {{- end }}
+        {{- end }}
         {{- end }}
         {{- if .Values.backstage.extraVolumes }}
           {{- include "common.tplvalues.render" ( dict "value" .Values.backstage.extraVolumes "context" $ ) | nindent 8 }}
@@ -106,9 +118,18 @@ spec:
             - {{ . | quote }}
           {{- end }}
           {{- if .Values.backstage.extraAppConfig }}
+          {{- if (kindIs "map" .Values.backstage.extraAppConfig) }}
+          {{- /* If extraAppConfig is a dict, merge it automatically by key */ -}}
+          {{- range $_, $value := .Values.backstage.extraAppConfig }}
+            - "--config"
+            - "{{ $installDir }}/{{ $value.filename }}"
+          {{- end }}
+          {{- else if (kindIs "slice" .Values.backstage.extraAppConfig) }}
+          {{- /* If extraAppConfig is a list, keep current behavior (no merging) */ -}}
           {{- range .Values.backstage.extraAppConfig }}
             - "--config"
             - "{{ $installDir }}/{{ .filename }}"
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- if .Values.backstage.appConfig }}
@@ -156,7 +177,16 @@ spec:
                   key: {{ include "backstage.postgresql.databaseSecretKey" . }}
             {{- end }}
             {{- if .Values.backstage.extraEnvVars }}
+            {{- if (kindIs "map" .Values.backstage.extraEnvVars) }}
+            {{- /* If extraEnvVars is a dict, merge it automatically by key */ -}}
+            {{- range $_, $value := .Values.backstage.extraEnvVars }}
+            - name: {{ $value.name }}
+              {{- include "common.tplvalues.render" ( dict "value" $value "context" $) | nindent 14 }}
+            {{- end }}
+            {{- else if (kindIs "slice" .Values.backstage.extraEnvVars) }}
+            {{- /* If extraEnvVars is a list, keep current behavior (no merging) */ -}}
             {{- include "common.tplvalues.render" ( dict "value" .Values.backstage.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
             {{- end }}
           ports:
             - name: backend
@@ -167,10 +197,22 @@ spec:
             {{- end }}
           {{- if (or .Values.backstage.extraAppConfig .Values.backstage.appConfig (and .Values.backstage.extraVolumeMounts .Values.backstage.extraVolumes)) }}
           volumeMounts:
+            {{- if .Values.backstage.extraAppConfig }}
+            {{- if (kindIs "map" .Values.backstage.extraAppConfig) }}
+            {{- /* If extraAppConfig is a dict, merge it automatically by key */ -}}
+            {{- range $_, $value := .Values.backstage.extraAppConfig }}
+            - name: {{ $value.configMapRef }}
+              mountPath: "{{ $installDir }}/{{ $value.filename }}"
+              subPath: {{ $value.filename }}
+            {{- end }}
+            {{- else if (kindIs "slice" .Values.backstage.extraAppConfig) }}
+            {{- /* If extraAppConfig is a list, keep current behavior (no merging) */ -}}
             {{- range .Values.backstage.extraAppConfig }}
             - name: {{ .configMapRef }}
               mountPath: "{{ $installDir }}/{{ .filename }}"
               subPath: {{ .filename }}
+            {{- end }}
+            {{- end }}
             {{- end }}
             {{- if .Values.backstage.appConfig }}
             - name: backstage-app-config

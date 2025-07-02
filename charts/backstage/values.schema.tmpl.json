@@ -65,16 +65,29 @@
             "default": {}
         },
         "extraDeploy": {
-            "title": "Array of extra objects to deploy with the release",
-            "type": "array",
-            "default": [],
-            "items": {
-                "type": [
-                    "string",
-                    "object"
-                ]
-            },
-            "uniqueItems": true
+            "title": "Array or dict of extra objects to deploy with the release",
+            "oneOf": [
+                {
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": [
+                            "string",
+                            "object"
+                        ]
+                    },
+                    "uniqueItems": true
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": [
+                            "string",
+                            "object"
+                        ]
+                    }
+                }
+            ]
         },
         "diagnosticMode": {
             "title": "Enable diagnostic mode in the Deployment",
@@ -366,20 +379,38 @@
                 },
                 "extraAppConfig": {
                     "title": "Extra app configuration files to inline into command arguments",
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "properties": {
-                            "filename": {
-                                "type": "string"
+                    "oneOf": [
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                    "filename": {
+                                        "type": "string"
+                                    },
+                                    "configMapRef": {
+                                        "type": "string"
+                                    }
+                                }
                             },
-                            "configMapRef": {
-                                "type": "string"
+                            "default": []
+                        },
+                        {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "properties": {
+                                    "filename": {
+                                        "type": "string"
+                                    },
+                                    "configMapRef": {
+                                        "type": "string"
+                                    }
+                                }
                             }
                         }
-                    },
-                    "default": []
+                    ]
                 },
                 "extraContainers": {
                     "title": "Deployment sidecars.",
@@ -391,18 +422,37 @@
                 },
                 "extraEnvVars": {
                     "title": "Backstage container environment variables",
-                    "type": "array",
-                    "items": {
-                        "$ref": "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master/_definitions.json#/definitions/io.k8s.api.core.v1.EnvVar"
-                    },
-                    "default": [],
-                    "examples": [
-                        [
-                            {
-                                "name": "APP_CONFIG_backend_cache_store",
-                                "value": "memory"
-                            }
-                        ]
+                    "oneOf": [
+                        {
+                            "type": "array",
+                            "items": {
+                                "$ref": "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master/_definitions.json#/definitions/io.k8s.api.core.v1.EnvVar"
+                            },
+                            "default": [],
+                            "examples": [
+                                [
+                                    {
+                                        "name": "APP_CONFIG_backend_cache_store",
+                                        "value": "memory"
+                                    }
+                                ]
+                            ]
+                        },
+                        {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "$ref": "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master/_definitions.json#/definitions/io.k8s.api.core.v1.EnvVar"
+                            },
+                            "examples": [
+                                {
+                                    "APP_CONFIG_backend_cache_store": {
+                                        "name": "APP_CONFIG_backend_cache_store",
+                                        "value": "memory"
+                                    }
+                                }
+                            ]
+                        }
                     ]
                 },
                 "extraEnvVarsCM": {

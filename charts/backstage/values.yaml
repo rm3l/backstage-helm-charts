@@ -35,7 +35,7 @@ commonLabels: {}
 # -- Annotations to add to all deployed objects
 commonAnnotations: {}
 
-# -- Array of extra objects to deploy with the release
+# -- Array or dict of extra objects to deploy with the release
 extraDeploy: []
 
 # -- Enable diagnostic mode in the Deployment
