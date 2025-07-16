@@ -117,6 +117,7 @@ Kubernetes: `>= 1.19.0-0`
 | backstage.annotations | Additional custom annotations for the `Deployment` resource | object | `{}` |
 | backstage.appConfig | Generates ConfigMap and configures it in the Backstage pods | object | `{}` |
 | backstage.args | Backstage container command arguments | list | `[]` |
+| backstage.autoscaling | Autoscaling configuration. <br /> Ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/ | object | `{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80}` |
 | backstage.command | Backstage container command | list | `["node","packages/backend"]` |
 | backstage.containerPorts | Container ports on the Deployment | object | `{"backend":7007}` |
 | backstage.containerSecurityContext | Security settings for a Container. <br /> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container | object | `{}` |

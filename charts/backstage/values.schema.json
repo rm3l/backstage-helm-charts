@@ -792,6 +792,38 @@
                     "title": "Backstage container command arguments",
                     "type": "array"
                 },
+                "autoscaling": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "enabled": {
+                            "default": false,
+                            "description": "Enable autoscaling",
+                            "title": "Backstage Autoscaling",
+                            "type": "boolean"
+                        },
+                        "maxReplicas": {
+                            "default": 100,
+                            "title": "Maximum number of Backstage pod replicas that the autoscaler is allowed to scale up to",
+                            "type": "integer"
+                        },
+                        "minReplicas": {
+                            "default": 1,
+                            "title": "Minimum number of Backstage pod replicas that the autoscaler is allowed to scale down to",
+                            "type": "integer"
+                        },
+                        "targetCPUUtilizationPercentage": {
+                            "default": 80,
+                            "title": "Percentage of CPU that each Backstage pod should be using on average before the autoscaler decides to scale",
+                            "type": "integer"
+                        },
+                        "targetMemoryUtilizationPercentage": {
+                            "title": "Percentage of memory that each Backstage pod should be using on average before the autoscaler decides to scale",
+                            "type": "integer"
+                        }
+                    },
+                    "title": "Autoscaling parameters",
+                    "type": "object"
+                },
                 "command": {
                     "default": [
                         "node",
