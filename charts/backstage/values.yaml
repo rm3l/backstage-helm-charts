@@ -17,7 +17,7 @@ global:
 
 # -- Common parameters
 
-# -- Override Kubernetes version
+# -- Kubernetes version to override
 kubeVersion: ""
 
 # -- String to partially override common.names.fullname
