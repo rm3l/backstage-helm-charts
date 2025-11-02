@@ -1,0 +1,75 @@
+name: Pre-commit
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    name: Pre-commit
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write  # Required to post comments
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # pin@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # pin@v4
+        with:
+          python-version: 3.12
+
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # pin@v3
+        with:
+          go-version: ^1
+
+      - name: Setup helm-docs
+        run: go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
+
+      - name: Run pre-commit
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # pin@v3.0.1
+        continue-on-error: true  # Don't fail immediately; we'll handle it below
+        with:
+          extra_args: --verbose --all-files --show-diff-on-failure
+
+      - name: Check for changes after pre-commit
+        id: diff-checker
+        run: |
+          echo "CHANGED=$(if git diff --quiet; then echo "false"; else echo "true"; fi)" >> $GITHUB_OUTPUT
+
+      - name: Comment PR with diff
+        if: ${{ steps.diff-checker.outputs.CHANGED == 'true' }}
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const {
+              exitCode,
+              stdout,
+              stderr
+            } = await exec.getExecOutput('git', ['diff']);
+            console.log(exitCode, stderr);
+
+            const body = `
+              ## ⚠️ Pre-commit Hook Failures
+              <details>
+              <summary>View diff</summary>
+
+              \`\`\`diff
+              ${stdout}
+              \`\`\`
+
+              </details>
+              Please apply the above diff in your PR branch (or run \`pre-commit run --all-files\` locally) and push the changes.
+            `;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
