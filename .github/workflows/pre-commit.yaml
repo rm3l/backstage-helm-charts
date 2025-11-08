@@ -11,8 +11,6 @@ jobs:
   pre-commit:
     name: Pre-commit
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write  # Required to post comments
     env:
       GO111MODULE: on
     steps:
@@ -43,33 +41,18 @@ jobs:
         run: |
           echo "CHANGED=$(if git diff --quiet; then echo "false"; else echo "true"; fi)" >> $GITHUB_OUTPUT
 
-      - name: Comment PR with diff
+      - name: Save diff and PR metadata
         if: ${{ steps.diff-checker.outputs.CHANGED == 'true' }}
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        run: |
+          mkdir -p ./pr-comment
+          git diff > ./pr-comment/diff.txt
+          echo "${{ github.event.number }}" > ./pr-comment/pr-number.txt
+          echo "Pre-commit hooks made changes. See diff artifact."
+
+      - name: Upload diff artifact
+        if: ${{ steps.diff-checker.outputs.CHANGED == 'true' }}
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4
         with:
-          script: |
-            const {
-              exitCode,
-              stdout,
-              stderr
-            } = await exec.getExecOutput('git', ['diff']);
-            console.log(exitCode, stderr);
-
-            const body = `
-              ## ⚠️ Pre-commit Hook Failures
-              <details>
-              <summary>View diff</summary>
-
-              \`\`\`diff
-              ${stdout}
-              \`\`\`
-
-              </details>
-              Please apply the above diff in your PR branch (or run \`pre-commit run --all-files\` locally) and push the changes.
-            `;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            });
+          name: pre-commit-diff
+          path: pr-comment/
+          retention-days: 1
