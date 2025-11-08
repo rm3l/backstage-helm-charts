@@ -12,7 +12,7 @@ global:
   imageRegistry: ""
 
   # -- Global Image Pull Secrets secret names as an array
-  # </br> E.g. `imagePullSecrets: [myRegistryKeySecretName]`
+  # </br> E.g. `imagePullSecrets: [myPullSecret1]`
   imagePullSecrets: []
 
 # -- Common parameters
