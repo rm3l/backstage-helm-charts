@@ -2,7 +2,7 @@
 # Backstage Helm Chart
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/backstage)](https://artifacthub.io/packages/search?repo=backstage)
-![Version: 2.6.2](https://img.shields.io/badge/Version-2.6.2-informational?style=flat-square)
+![Version: 2.7.0](https://img.shields.io/badge/Version-2.7.0-informational?style=flat-square)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying a Backstage application
@@ -161,8 +161,8 @@ Kubernetes: `>= 1.19.0-0`
 | extraDeploy | Array of extra objects to deploy with the release | list | `[]` |
 | fullnameOverride | String to fully override common.names.fullname | string | `""` |
 | global | Global parameters Global Docker image parameters Please, note that this will override the image parameters, including dependencies, configured to use the global value Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass | object | See below |
-| global.imagePullSecrets | Global Docker registry secret names as an array </br> E.g. `imagePullSecrets: [myRegistryKeySecretName]` | list | `[]` |
-| global.imageRegistry | Global Docker image registry | string | `""` |
+| global.imagePullSecrets | Global Image Pull Secrets secret names as an array </br> E.g. `imagePullSecrets: [myPullSecret1]` | list | `[]` |
+| global.imageRegistry | Global container image registry | string | `""` |
 | ingress | Ingress parameters | object | `{"annotations":{},"className":"","enabled":false,"extraHosts":[],"extraTls":[],"host":"","path":"/","tls":{"enabled":false,"secretName":""}}` |
 | ingress.annotations | Additional annotations for the Ingress resource | object | `{}` |
 | ingress.className | Name of the IngressClass cluster resource which defines which controller will implement the resource (e.g nginx) | string | `""` |
@@ -174,7 +174,7 @@ Kubernetes: `>= 1.19.0-0`
 | ingress.tls | Ingress TLS parameters | object | `{"enabled":false,"secretName":""}` |
 | ingress.tls.enabled | Enable TLS configuration for the host defined at `ingress.host` parameter | bool | `false` |
 | ingress.tls.secretName | The name to which the TLS Secret will be called | string | `""` |
-| kubeVersion | Override Kubernetes version | string | `""` |
+| kubeVersion | Kubernetes version to override | string | `""` |
 | metrics | Metrics configuration | object | `{"serviceMonitor":{"annotations":{},"enabled":false,"interval":null,"labels":{},"path":"/metrics","port":"http-backend"}}` |
 | metrics.serviceMonitor | ServiceMonitor configuration <br /> Allows configuring your backstage instance as a scrape target for [Prometheus](https://github.com/prometheus/prometheus) using a ServiceMonitor custom resource that [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) can understand. | object | `{"annotations":{},"enabled":false,"interval":null,"labels":{},"path":"/metrics","port":"http-backend"}` |
 | metrics.serviceMonitor.annotations | ServiceMonitor annotations | object | `{}` |
