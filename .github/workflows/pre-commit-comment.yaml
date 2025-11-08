@@ -129,7 +129,7 @@ jobs:
             
             </details>
             
-            Please apply the above diff in your PR branch (or run \`pre-commit run --all-files\` locally) and push the changes.`;
+            Please apply the above diff in your PR branch (or run \`[pre-commit](https://pre-commit.com/#install) run --all-files\` locally) and push the changes.`;
             
             await github.rest.issues.createComment({
               issue_number: prNumber,
