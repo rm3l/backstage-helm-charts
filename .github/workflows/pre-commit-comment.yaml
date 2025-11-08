@@ -45,19 +45,24 @@ jobs:
             
             if (!prNumber) {
               // Get PR number from the workflow run event
+              const headRepo = context.payload.workflow_run.head_repository.owner.login;
+              const headBranch = context.payload.workflow_run.head_branch;
+              
+              console.log(`Looking for PR with head: ${headRepo}:${headBranch}`);
+              
               const { data: pullRequests } = await github.rest.pulls.list({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 state: 'open',
-                head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`,
+                head: `${headRepo}:${headBranch}`,
               });
               
               if (pullRequests.length > 0) {
                 prNumber = pullRequests[0].number;
-                console.log(`Found PR #${prNumber} for branch ${context.payload.workflow_run.head_branch}`);
+                console.log(`Found PR #${prNumber} for branch ${headBranch}`);
               } else {
                 console.log('No open PR found for this workflow run');
-                core.setFailed('Could not determine PR number');
+                console.log('This might be a push to a non-PR branch, skipping comment workflow');
                 return;
               }
             }
