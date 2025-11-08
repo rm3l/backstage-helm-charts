@@ -8,10 +8,10 @@
 # Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
 # @default -- See below
 global:
-  # -- Global Docker image registry
+  # -- Global container image registry
   imageRegistry: ""
 
-  # -- Global Docker registry secret names as an array
+  # -- Global Image Pull Secrets secret names as an array
   # </br> E.g. `imagePullSecrets: [myRegistryKeySecretName]`
   imagePullSecrets: []
 
