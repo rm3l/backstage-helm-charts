@@ -56,3 +56,9 @@ jobs:
           name: pre-commit-diff
           path: pr-comment/
           retention-days: 1
+
+      - name: Fail if changes were made
+        if: ${{ steps.diff-checker.outputs.CHANGED == 'true' }}
+        run: |
+          echo "::error::Pre-commit hooks made changes. Please review the diff in the PR comment and apply the fixes."
+          exit 1

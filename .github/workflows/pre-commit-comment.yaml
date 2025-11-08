@@ -49,11 +49,19 @@ jobs:
               issue_number: prNumber,
             });
             
+            console.log(`Found ${comments.length} total comments on PR #${prNumber}`);
+            
             // Filter comments created by github-actions bot that contain our marker
-            const botComments = comments.filter(comment => 
-              comment.user.type === 'Bot' && 
-              comment.body.includes('⚠️ Pre-commit Hook Failures')
-            );
+            const botComments = comments.filter(comment => {
+              const isBot = comment.user.login === 'github-actions[bot]';
+              const hasMarker = comment.body && comment.body.includes('⚠️ Pre-commit Hook Failures');
+              if (isBot && hasMarker) {
+                console.log(`Found matching comment ${comment.id} to delete`);
+              }
+              return isBot && hasMarker;
+            });
+            
+            console.log(`Found ${botComments.length} pre-commit failure comment(s) to delete`);
             
             // Delete each matching comment
             for (const comment of botComments) {
@@ -65,7 +73,7 @@ jobs:
               });
             }
             
-            console.log(`Deleted ${botComments.length} previous pre-commit failure comment(s).`);
+            console.log(`Successfully deleted ${botComments.length} previous pre-commit failure comment(s).`);
 
       - name: Post comment
         if: steps.extract.outputs.HAS_DIFF == 'true'
